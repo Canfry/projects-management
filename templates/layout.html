@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>{% block title %}My app{% endblock %}</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="{{url_for('static',filename='css/output.css')}}" rel="stylesheet">
+</head>
+
+<body class="bg-gray-950 w-full h-screen flex flex-col">
+	<header class="w-full py-10 px-40 flex items-center justify-between shadow-lg shadow-sky-200/5">
+		<div>
+			<a {% if session["username"] and session["user_id"] %} href="{{ url_for('dashboard') }}" {% else %}
+				href="{{ url_for('index') }}" {% endif %} class="text-4xl text-sky-100">MyTeams</a>
+		</div>
+		<div class="flex justify-between items-center gap-x-4">
+			{% if session["username"] and session["user_id"] %}
+			<h1 class="text-sky-100">Welcome {{ session["username"] }}</h1>
+			<a href="{{ url_for('logout')}}"><button
+					class="bg-sky-100 text-gray-950 px-4 py-2 rounded-lg">Logout</button></a>
+			{% endif %}
+		</div>
+
+	</header>
+	<main class="flex-1 px-40 flex flex-col gap-y-4 items-center py-10 justify-center h-full">
+		{% block content %}
+		{% endblock %}
+	</main>
+	<footer>
+		<div class="text-center w-full py-10">
+			<p class="text-sky-100">&copy; 2024 MyTeams</p>
+		</div>
+	</footer>
+
+</body>
+
+</html>

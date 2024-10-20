@@ -1,0 +1,123 @@
+from flask import Flask, render_template, request, redirect, flash, session
+from datetime import datetime
+from flask_session import Session
+import validators
+import sqlite3
+import os
+from werkzeug.security import check_password_hash, generate_password_hash
+from utils import login_required
+
+from dotenv import load_dotenv
+from datetime import timedelta
+
+# Initialize the Flask application
+app = Flask(__name__)
+
+# Configure the session
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+app.config.from_object(__name__)
+# Security for HTTPS
+app.config['SESSION_COOKIE_SECURE'] = True
+# Prevent malicious scripts
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
+Session(app)
+
+
+# Set up database
+connection = sqlite3.connect("projects.db", check_same_thread=False)
+cursor = connection.cursor()
+
+# Set up variables
+now = datetime.now()
+
+load_dotenv()
+
+
+# Create tables
+cursor.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, username TEXT NOT NULL, email TEXT NOT NULL, hash TEXT NOT NULL, is_admin TEXT NOT NULL, comment_id INTEGER, post_id INTEGER, project_id INTEGER, FOREIGN KEY(comment_id) REFERENCES comments(id), FOREIGN KEY(post_id) REFERENCES posts(id), FOREIGN KEY(project_id) REFERENCES projects(id))")
+
+cursor.execute("CREATE TABLE IF NOT EXISTS projects (id INTEGER PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL, user_id INTEGER, comment_id INTEGER, post_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(comment_id) REFERENCES comments(id), FOREIGN KEY(post_id) REFERENCES posts(id))")
+
+cursor.execute("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, text TEXT, user_id INTEGER, project_id INTEGER, post_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(project_id) REFERENCES projects(id), FOREIGN KEY(post_id) REFERENCES posts(id))")
+
+cursor.execute("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, body TEXT NOT NULL, user_id INTEGER, project_id INTEGER, comment_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(project_id) REFERENCES projects(id), FOREIGN KEY(comment_id) REFERENCES comments(id))")
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if not validators.email(request.form.get('email')):
+            flash('Please enter a valid email address')
+            return redirect('/login')
+        elif len(request.form.get('password')) < 6:
+            flash('Password must be at least 6 characters')
+            return redirect('/login')
+
+        # Query the database
+        email = request.form.get('email')
+        password = request.form.get('password')
+        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        user = cursor.fetchone()
+        if user is None or not check_password_hash(user[4], password):
+            flash('Invalid email and/or password')
+            return redirect('/login')
+
+        session['user_id'] = user[0]
+        session['username'] = user[2]
+        session['admin'] = user[5]
+
+        return redirect('/dashboard')
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        if not validators.email(request.form.get('email')):
+            flash('Please enter a valid email address')
+            return redirect('/register')
+        elif len(request.form.get('password')) < 6:
+            flash('Password must be at least 6 characters')
+            return redirect('/register')
+
+        name = request.form.get('name')
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        hashed_password = generate_password_hash(password)
+        admin = request.form.get('admin')
+
+        cursor.execute("INSERT INTO users (name, username, email, hash, is_admin) VALUES (?, ?, ?, ?, ?)",
+                       (name, username, email, hashed_password, admin))
+        connection.commit()
+
+        flash('Account created successfully')
+        session['user_id'] = cursor.lastrowid
+
+        return redirect('/dashboard')
+
+    return render_template('register.html')
+
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+
+
+if __name__ == '__main__':
+    app.run()
