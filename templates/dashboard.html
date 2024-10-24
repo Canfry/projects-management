@@ -3,7 +3,8 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 <div class="w-full h-full flex items-center">
-	<div class="w-1/5 h-full rounded-lg py-4 text-cyan-100">
-		<a><button>Create Project</button></a>
+	<div class="w-1/5 h-full rounded-lg py-4 text-cyan-100 border-r border-cyan-100">
+		<a href="{{ url_for('create_project' )}}"><button
+				class="py-1 px-2 rounded-lg bg-cyan-100 text-gray-950 hover:bg-cyan-200">Create Project</buton></a>
 	</div>
 	{% endblock %}

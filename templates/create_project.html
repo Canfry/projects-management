@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>Create Project</h1>
+
+<form method="/create_project" action="post" class="w-full">
+	{{ mdeditor.load() }}
+</form>
+{%endblock%}
