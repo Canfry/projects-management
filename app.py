@@ -129,7 +129,7 @@ def create_project():
         name = request.form.get('name')
         description = request.form.get('description')
 
-        user = request.form.get('user')
+        user = request.form.get('user_id')
         cursor.execute("SELECT id FROM users WHERE name = ?", (user,))
         user_id = cursor.fetchone()
 
@@ -142,6 +142,7 @@ def create_project():
 
     cursor.execute("SELECT name FROM users")
     users = cursor.fetchall()
+    print(users)
     return render_template('create_project.html', users=users)
 
 
