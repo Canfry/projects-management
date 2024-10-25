@@ -129,14 +129,20 @@ def create_project():
         name = request.form.get('name')
         description = request.form.get('description')
 
+        user = request.form.get('user')
+        cursor.execute("SELECT id FROM users WHERE name = ?", (user,))
+        user_id = cursor.fetchone()
+
         cursor.execute("INSERT INTO projects (name, description, user_id) VALUES (?, ?, ?)",
-                       (name, description, session['user_id']))
+                       (name, description, user_id[0]))
         connection.commit()
 
         flash('Project created successfully')
         return redirect('/dashboard')
 
-    return render_template('create_project.html')
+    cursor.execute("SELECT name FROM users")
+    users = cursor.fetchall()
+    return render_template('create_project.html', users=users)
 
 
 if __name__ == '__main__':
