@@ -119,28 +119,34 @@ def register():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    cursor.execute(
+        "SELECT users.name, projects.name FROM users JOIN projects ON users.id = projects.user_id")
+    projects = cursor.fetchall()
+    print(projects)
+
+    return render_template('dashboard.html', projects=projects)
 
 
 @app.route('/create_project', methods=['GET', 'POST'])
 @login_required
 def create_project():
     if request.method == 'POST':
-        name = request.form.get('name')
+        name = request.form.get('title')
         description = request.form.get('description')
 
-        user = request.form.get('user_id')
-        cursor.execute("SELECT id FROM users WHERE name = ?", (user,))
-        user_id = cursor.fetchone()
+        user_id = request.form.get('user_id')
+        # cursor.execute("SELECT id FROM users WHERE name = ?", (user,))
+        # user_id = cursor.fetchone()
+        # print(user_id)
 
         cursor.execute("INSERT INTO projects (name, description, user_id) VALUES (?, ?, ?)",
-                       (name, description, user_id[0]))
+                       (name, description, user_id))
         connection.commit()
 
         flash('Project created successfully')
         return redirect('/dashboard')
 
-    cursor.execute("SELECT name FROM users")
+    cursor.execute("SELECT name, id FROM users")
     users = cursor.fetchall()
     print(users)
     return render_template('create_project.html', users=users)

@@ -4,7 +4,7 @@
 <h1>Create Project</h1>
 
 <h1 class='text-cyan-100 font-bold text-xl'>Create Project</h1>
-<form method="/create_project" action="post"
+<form action="{{url_for('create_project')}}" method="POST"
 	class="w-full bg-gray-900 text-cyan-100 py-16 px-16 h-full rounded-lg shadow-gray-700 shadow-md">
 	<label for="title" class="text-bold text-xl mb-4">Title</label>
 	<input type="text" name="title" placeholder="Title"
@@ -16,7 +16,7 @@
 	<select name="user_id" class="w-full bg-gray-950 text-cyan-100 rounded-lg py-6 px-6 mt-2 mb-6">
 		<option disabled>Select a user</option>
 		{% for user in users %}
-		<option value='user'>{{ user[0] }}</option>
+		<option value='{{ user[1] }}'>{{ user[0] }}</option>
 		{% endfor %}
 	</select>
 	{# mdeditor.load() #}

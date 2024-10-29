@@ -7,4 +7,15 @@
 		<a href="{{ url_for('create_project' )}}"><button
 				class="py-1 px-2 rounded-lg bg-cyan-100 text-gray-950 hover:bg-cyan-200">Create Project</buton></a>
 	</div>
+	<div class="w-4/5 h-full">
+		{% for project in projects %}
+		<div class="w-full flex items-center justify-between pl-8 my-4">
+			<a href="#">
+				<h1 class="text-cyan-100 text-lg flex-1">{{ project[1] }}</h1>
+			</a>
+			<p class="text-cyan-100 text-sm">{{ project[0] }}</p>
+			<button class="py-1 px-2 rounded-lg bg-cyan-100 text-gray-950 hover:bg-cyan-200">Delete</button>
+		</div>
+		{% endfor %}
+	</div>
 	{% endblock %}
