@@ -51,6 +51,8 @@ cursor.execute("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, body T
 
 @app.route('/')
 def index():
+    if 'user_id' in session:
+        return redirect('/dashboard')
     return render_template('index.html')
 
 
