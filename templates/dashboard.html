@@ -10,7 +10,7 @@
 	<div class="w-4/5 h-full">
 		{% for project in projects %}
 		<div class="w-full flex items-center justify-between pl-8 my-4">
-			<a href="#">
+			<a href="{{url_for('project', project_id=project[2])}}">
 				<h1 class="text-cyan-100 text-lg flex-1">{{ project[1] }}</h1>
 			</a>
 			<p class="text-cyan-100 text-sm">{{ project[0] }}</p>

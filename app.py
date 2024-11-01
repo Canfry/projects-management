@@ -164,5 +164,24 @@ def delete_project(project_id):
     return redirect('/dashboard')
 
 
+@app.route('/project/<int:project_id>')
+@login_required
+def project(project_id):
+    cursor.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
+    project = cursor.fetchone()
+    print(project)
+
+    cursor.execute(
+        "SELECT * FROM comments WHERE project_id = ?", (project_id,))
+    comments = cursor.fetchall()
+    print(comments)
+
+    cursor.execute("SELECT * FROM posts WHERE project_id = ?", (project_id,))
+    posts = cursor.fetchall()
+    print(posts)
+
+    return render_template('project.html', project=project, comments=comments, posts=posts)
+
+
 if __name__ == '__main__':
     app.run()
