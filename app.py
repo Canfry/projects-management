@@ -122,7 +122,7 @@ def register():
 @login_required
 def dashboard():
     cursor.execute(
-        "SELECT users.name, projects.name FROM users JOIN projects ON users.id = projects.user_id")
+        "SELECT users.name, projects.name, projects.id FROM users JOIN projects ON users.id = projects.user_id")
     projects = cursor.fetchall()
     print(projects)
 
@@ -152,6 +152,16 @@ def create_project():
     users = cursor.fetchall()
     print(users)
     return render_template('create_project.html', users=users)
+
+
+@app.route('/delete_project/<int:project_id>')
+@login_required
+def delete_project(project_id):
+    cursor.execute("DELETE FROM projects WHERE id = ?", (project_id,))
+    connection.commit()
+
+    flash('Project deleted successfully')
+    return redirect('/dashboard')
 
 
 if __name__ == '__main__':
