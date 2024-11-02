@@ -1,3 +1,5 @@
+import html
+import markdown
 from flask import Flask, render_template, request, redirect, flash, session
 from datetime import datetime
 from flask_session import Session
@@ -26,6 +28,10 @@ app.config['SESSION_COOKIE_SECURE'] = True
 # Prevent malicious scripts
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
+
+app.config['MDEDITOR_THEME'] = 'light'
+app.config['MDEDITOR_PREVIEW_THEME'] = 'light'
+app.config['MDEDITOR_EDITOR_THEME'] = 'pastel-on-light'
 Session(app)
 
 
@@ -164,12 +170,25 @@ def delete_project(project_id):
     return redirect('/dashboard')
 
 
-@app.route('/project/<int:project_id>')
+@app.route('/project/<int:project_id>', methods=['GET', 'POST'])
 @login_required
 def project(project_id):
+    if request.method == 'POST':
+        post = request.form.get('mdeditor')
+        user_id = session['user_id']
+
+        cursor.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
+        project = cursor.fetchone()
+        print(project)
+
+        cursor.execute("INSERT INTO posts (body, user_id, project_id) VALUES (?, ?, ?)",
+                       (post, user_id, project_id))
+        connection.commit()
+        return redirect(f'/project/{project_id}')
+
     cursor.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
     project = cursor.fetchone()
-    print(project)
+    print(len(project))
 
     cursor.execute(
         "SELECT * FROM comments WHERE project_id = ?", (project_id,))
@@ -178,9 +197,12 @@ def project(project_id):
 
     cursor.execute("SELECT * FROM posts WHERE project_id = ?", (project_id,))
     posts = cursor.fetchall()
-    print(posts)
+    post_html = markdown.markdown(posts[0][1])
+    print(type(post_html))
+    post = html.unescape(post_html)
+    print(post)
 
-    return render_template('project.html', project=project, comments=comments, posts=posts)
+    return render_template('project.html', markdown=markdown, project=project, comments=comments, post=post)
 
 
 if __name__ == '__main__':

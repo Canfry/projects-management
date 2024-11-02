@@ -3,6 +3,18 @@
 {% block title %}{{ project.name }}{% endblock %}
 
 {% block content %}
-<h1 class="text-cyan-100">{{ project[1] }}</h1>
-<p class="text-cyan-100">{{ project[2] }}</p>
+<div class="w-full h-full">
+	<h1 class="text-cyan-200 text-xl font-bold uppercase mb-4">{{ project[1] }}</h1>
+	<p class="text-cyan-50 font-light mb-4">{{ project[2] }}</p>
+	{% if post == '' %}
+	<form action="{{ url_for('project', project_id=project[0]) }}" method="post">
+		{{ mdeditor.load()}}
+		<button class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded">Submit</button>
+	</form>
+	{% else %}
+	<div class="bg-cyan-900 p-4 rounded mb-4">
+		{{ post|safe }}
+	</div>
+	{% endif %}
+</div>
 {% endblock %}
