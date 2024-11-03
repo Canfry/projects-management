@@ -14,9 +14,11 @@
 		class="w-full bg-gray-950 text-cyan-100 rounded-lg py-6 px-6 mt-2 mb-6">
 	<label for="user_id" class="text-bold mb-2 text-xl">User</label>
 	<select name="user_id" class="w-full bg-gray-950 text-cyan-100 rounded-lg py-6 px-6 mt-2 mb-6">
-		<option disabled>Select a user</option>
 		{% for user in users %}
+		{% if user[2] == 'no' %}
+		<option value='selection' selected disabled>Select a user</option>
 		<option value='{{ user[1] }}'>{{ user[0] }}</option>
+		{% endif %}
 		{% endfor %}
 	</select>
 	{# mdeditor.load() #}

@@ -1,7 +1,7 @@
 import html
 import markdown
 from flask import Flask, render_template, request, redirect, flash, session
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_session import Session
 from flask_mdeditor import MDEditor
 import validators
@@ -11,7 +11,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from utils import login_required
 
 from dotenv import load_dotenv
-from datetime import timedelta
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -41,6 +40,7 @@ cursor = connection.cursor()
 
 # Set up variables
 now = datetime.now()
+year = now.year
 
 load_dotenv()
 
@@ -53,6 +53,12 @@ cursor.execute("CREATE TABLE IF NOT EXISTS projects (id INTEGER PRIMARY KEY, nam
 cursor.execute("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, text TEXT, user_id INTEGER, project_id INTEGER, post_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(project_id) REFERENCES projects(id), FOREIGN KEY(post_id) REFERENCES posts(id))")
 
 cursor.execute("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, body TEXT NOT NULL, user_id INTEGER, project_id INTEGER, comment_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(project_id) REFERENCES projects(id), FOREIGN KEY(comment_id) REFERENCES comments(id))")
+
+
+# Context processors
+@app.context_processor
+def inject_year():
+    return {'year': year}
 
 
 @app.route('/')
@@ -131,7 +137,6 @@ def dashboard():
         "SELECT users.name, projects.name, projects.id FROM users JOIN projects ON users.id = projects.user_id")
     projects = cursor.fetchall()
     print(projects)
-
     return render_template('dashboard.html', projects=projects)
 
 
@@ -154,7 +159,7 @@ def create_project():
         flash('Project created successfully')
         return redirect('/dashboard')
 
-    cursor.execute("SELECT name, id FROM users")
+    cursor.execute("SELECT name, id, is_admin FROM users")
     users = cursor.fetchall()
     print(users)
     return render_template('create_project.html', users=users)
