@@ -7,14 +7,42 @@
 	<h1 class="text-cyan-200 text-xl font-bold uppercase mb-4">{{ project[1] }}</h1>
 	<p class="text-cyan-50 font-light mb-4">{{ project[2] }}</p>
 	{% if posts == [] %}
+	{% if admin == 'yes' %}
+	<div></div>
+	{% else %}
 	<form action="{{ url_for('project', project_id=project[0]) }}" method="post">
-		{{ mdeditor.load()}}
+		<textarea name="post" class="w-full h-32 bg-gray-800 text-gray-200 font-light p-2 mb-4"
+			placeholder="Post something..."></textarea>
 		<button class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded">Submit</button>
 	</form>
+	{% endif %}
 	{% else %}
-	<div class="bg-cyan-900 p-4 rounded mb-4">
-		{{ post|safe }}
+	{% for post in posts %}
+	<div class="text-gray-400 font-light">
+		{{ post[1]|safe }}
 	</div>
+	{% if comments == [] %}
+	<div></div>
+	{% else %}
+	{% for comment in comments %}
+	{% if comment[2] == session['user_id'] %}
+	<div class="text-gray-800 py-2 px-4 w-[90%] bg-cyan-200 my-4 mr-[10%] rounded-lg">
+		<p>{{ comment[1] }}</p>
+	</div>
+	{% else %}
+	<div class="bg-gray-800 py-2 px-4 w-[90%] text-cyan-200 my-4 ml-[10%] rounded-lg">
+		<p>{{ comment[1] }}</p>
+	</div>
+	{% endif %}
+	{% endfor %}
+	{% endif %}
+	<form action="{{ url_for('comment') }}" method="post">
+		<textarea name="comment" class="w-full h-16 bg-gray-800 text-gray-200 font-light p-2 my-6"
+			placeholder="Comment..."></textarea>
+		<input type="hidden" name="project_id" value="{{ post[3] }}" />
+		<button class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded">Add comment</button>
+	</form>
+	{% endfor %}
 	{% endif %}
 </div>
 {% endblock %}

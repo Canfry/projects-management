@@ -1,9 +1,6 @@
-import html
-import markdown
 from flask import Flask, render_template, request, redirect, flash, session
 from datetime import datetime, timedelta
 from flask_session import Session
-from flask_mdeditor import MDEditor
 import validators
 import sqlite3
 import os
@@ -14,8 +11,6 @@ from dotenv import load_dotenv
 
 # Initialize the Flask application
 app = Flask(__name__)
-# Initialize the Flask-MedEditor
-mdeditor = MDEditor(app)
 
 # Configure the session
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -122,8 +117,14 @@ def register():
                        (name, username, email, hashed_password, admin))
         connection.commit()
 
+        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        user = cursor.fetchone()
+
+        session['user_id'] = user[0]
+        session['username'] = user[2]
+        session['admin'] = user[5]
+
         flash('Account created successfully')
-        session['user_id'] = cursor.lastrowid
 
         return redirect('/dashboard')
 
@@ -141,7 +142,7 @@ def dashboard():
     cursor.execute(
         "SELECT users.name, users.is_admin, projects.name, projects.id FROM users JOIN projects ON users.id = projects.user_id WHERE users.id = ?", (session['user_id'],))
     user_projects = cursor.fetchall()
-    print(admin_projects)
+    print(user_projects)
 
     cursor.execute("SELECT is_admin FROM users WHERE id = ?",
                    (session['user_id'],))
@@ -190,7 +191,7 @@ def delete_project(project_id):
 @login_required
 def project(project_id):
     if request.method == 'POST':
-        post = request.form.get('mdeditor')
+        post = request.form.get('post')
         user_id = session['user_id']
 
         cursor.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
@@ -202,8 +203,12 @@ def project(project_id):
         connection.commit()
         return redirect(f'/project/{project_id}')
 
+    admin = session['admin']
+    print(admin)
+
     cursor.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
     project = cursor.fetchone()
+    print(project)
 
     cursor.execute(
         "SELECT * FROM comments WHERE project_id = ?", (project_id,))
@@ -212,13 +217,24 @@ def project(project_id):
 
     cursor.execute("SELECT * FROM posts WHERE project_id = ?", (project_id,))
     posts = cursor.fetchall()
-    if len(posts) != 0:
-        post_html = markdown.markdown(posts[0][1])
-        print(type(post_html))
-        post = html.unescape(post_html)
-        print(post)
-        return render_template('project.html', post=post)
-    return render_template('project.html', project=project, posts=posts)
+    print(posts)
+
+    return render_template('project.html', project=project, posts=posts, admin=admin, comments=comments)
+
+
+@app.route('/comment', methods=['POST'])
+@login_required
+def comment():
+    text = request.form.get('comment')
+    user_id = session['user_id']
+    project_id = request.form.get('project_id')
+    print(project_id)
+
+    cursor.execute("INSERT INTO comments (text, user_id, project_id) VALUES (?, ?, ?)",
+                   (text, user_id, project_id))
+    connection.commit()
+
+    return redirect(f'/project/{project_id}')
 
 
 if __name__ == '__main__':

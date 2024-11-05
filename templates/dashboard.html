@@ -9,21 +9,32 @@
 				class="py-1 px-2 rounded-lg bg-cyan-100 text-gray-950 hover:bg-cyan-200">Create Project</buton></a>
 	</div>
 	<div class="w-4/5 h-full">
-		{% for admin_project in admin_projects %}
+		{% if admin_projects == [] %}
+		<h1 class="text-cyan-100 text-lg">No projects created yet</h1>
+		{% else %}{% for admin_project in admin_projects %}
 		<div class="w-full flex items-center justify-between pl-8 my-4">
-			<a href="{{url_for('project', project_id=admin_project[3])}}">
-				<h1 class="text-cyan-100 text-lg flex-1">{{ admin_project[2] }}</h1>
-			</a>
-			<p class="text-cyan-100 text-sm">{{ admin_project[0] }}</p>
-			<a href="{{url_for('delete_project', project_id=admin_project[3])}}"><button
-					class="py-1 px-2 rounded-lg bg-cyan-100 text-gray-950 hover:bg-cyan-200">Delete</button></a>
+			<div class="flex-1">
+				<a href="{{url_for('project', project_id=admin_project[3])}}">
+					<h1 class="text-cyan-100 text-lg flex-1">{{ admin_project[2] }}</h1>
+				</a>
+			</div>
+			<div class="text-left flex-1">
+				<p class="text-cyan-100 text-sm text-left flex-1">{{ admin_project[0] }}</p>
+			</div>
+			<div>
+				<a href="{{url_for('delete_project', project_id=admin_project[3])}}"><button
+						class="py-1 px-2 rounded-lg bg-cyan-100 text-gray-950 hover:bg-cyan-200">Delete</button></a>
+			</div>
 		</div>
 		{% endfor %}
+		{% endif %}
 	</div>
 </div>
 {% else %}
 <div class="w-full h-full">
-	{% for user_project in user_projects %}
+	{% if user_projects == [] %}
+	<h1 class="text-cyan-100 text-lg">No projects created yet</h1>
+	{% else %}{% for user_project in user_projects %}
 	<div class="w-full flex items-center justify-between pl-8 my-4">
 		<a href="{{url_for('project', project_id=user_project[3])}}">
 			<h1 class="text-cyan-100 text-lg flex-1">{{ user_project[2] }}</h1>
@@ -31,6 +42,7 @@
 		<p class="text-cyan-100 text-sm">{{ user_project[0] }}</p>
 	</div>
 	{% endfor %}
+	{% endif %}
 </div>
 {% endif %}
 {% endblock %}
