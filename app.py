@@ -52,7 +52,7 @@ cursor.execute("CREATE TABLE IF NOT EXISTS projects (id INTEGER PRIMARY KEY, nam
 
 cursor.execute("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, text TEXT, user_id INTEGER, project_id INTEGER, post_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(project_id) REFERENCES projects(id), FOREIGN KEY(post_id) REFERENCES posts(id))")
 
-cursor.execute("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, body TEXT NOT NULL, user_id INTEGER, project_id INTEGER, comment_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(project_id) REFERENCES projects(id), FOREIGN KEY(comment_id) REFERENCES comments(id))")
+cursor.execute("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, body TEXT, user_id INTEGER, project_id INTEGER, comment_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(project_id) REFERENCES projects(id), FOREIGN KEY(comment_id) REFERENCES comments(id))")
 
 
 # Context processors
@@ -134,10 +134,21 @@ def register():
 @login_required
 def dashboard():
     cursor.execute(
-        "SELECT users.name, projects.name, projects.id FROM users JOIN projects ON users.id = projects.user_id")
-    projects = cursor.fetchall()
-    print(projects)
-    return render_template('dashboard.html', projects=projects)
+        "SELECT users.name, users.is_admin, projects.name, projects.id FROM users JOIN projects ON users.id = projects.user_id")
+    admin_projects = cursor.fetchall()
+    print(admin_projects)
+
+    cursor.execute(
+        "SELECT users.name, users.is_admin, projects.name, projects.id FROM users JOIN projects ON users.id = projects.user_id WHERE users.id = ?", (session['user_id'],))
+    user_projects = cursor.fetchall()
+    print(admin_projects)
+
+    cursor.execute("SELECT is_admin FROM users WHERE id = ?",
+                   (session['user_id'],))
+    admin = cursor.fetchone()
+    print(admin)
+
+    return render_template('dashboard.html', admin_projects=admin_projects, user_projects=user_projects, admin=admin)
 
 
 @app.route('/create_project', methods=['GET', 'POST'])
@@ -193,7 +204,6 @@ def project(project_id):
 
     cursor.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
     project = cursor.fetchone()
-    print(len(project))
 
     cursor.execute(
         "SELECT * FROM comments WHERE project_id = ?", (project_id,))
@@ -202,12 +212,13 @@ def project(project_id):
 
     cursor.execute("SELECT * FROM posts WHERE project_id = ?", (project_id,))
     posts = cursor.fetchall()
-    post_html = markdown.markdown(posts[0][1])
-    print(type(post_html))
-    post = html.unescape(post_html)
-    print(post)
-
-    return render_template('project.html', markdown=markdown, project=project, comments=comments, post=post)
+    if len(posts) != 0:
+        post_html = markdown.markdown(posts[0][1])
+        print(type(post_html))
+        post = html.unescape(post_html)
+        print(post)
+        return render_template('project.html', post=post)
+    return render_template('project.html', project=project, posts=posts)
 
 
 if __name__ == '__main__':

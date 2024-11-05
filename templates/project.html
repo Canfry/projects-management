@@ -1,12 +1,12 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ project.name }}{% endblock %}
+{% block title %}{{ project[1] }}{% endblock %}
 
 {% block content %}
 <div class="w-full h-full">
 	<h1 class="text-cyan-200 text-xl font-bold uppercase mb-4">{{ project[1] }}</h1>
 	<p class="text-cyan-50 font-light mb-4">{{ project[2] }}</p>
-	{% if post == '' %}
+	{% if posts == [] %}
 	<form action="{{ url_for('project', project_id=project[0]) }}" method="post">
 		{{ mdeditor.load()}}
 		<button class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded">Submit</button>
