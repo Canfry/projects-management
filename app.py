@@ -1,31 +1,19 @@
 from flask import Flask, render_template, request, redirect, flash, session
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask_session import Session
 import validators
 import sqlite3
-import os
 from werkzeug.security import check_password_hash, generate_password_hash
 from utils import login_required
 
 from dotenv import load_dotenv
 
+from config import config
+
 # Initialize the Flask application
 app = Flask(__name__)
+config(app)
 
-# Configure the session
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-app.config.from_object(__name__)
-# Security for HTTPS
-app.config['SESSION_COOKIE_SECURE'] = True
-# Prevent malicious scripts
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
-
-app.config['MDEDITOR_THEME'] = 'light'
-app.config['MDEDITOR_PREVIEW_THEME'] = 'light'
-app.config['MDEDITOR_EDITOR_THEME'] = 'pastel-on-light'
 Session(app)
 
 
