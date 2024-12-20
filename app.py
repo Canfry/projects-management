@@ -29,13 +29,66 @@ load_dotenv()
 
 
 # Create tables
-cursor.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, username TEXT NOT NULL, email TEXT NOT NULL, hash TEXT NOT NULL, is_admin TEXT NOT NULL, comment_id INTEGER, post_id INTEGER, project_id INTEGER, FOREIGN KEY(comment_id) REFERENCES comments(id), FOREIGN KEY(post_id) REFERENCES posts(id), FOREIGN KEY(project_id) REFERENCES projects(id))")
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    username TEXT NOT NULL,
+    email TEXT NOT NULL,
+    hash TEXT NOT NULL,
+    is_admin TEXT NOT NULL,
+    comment_id INTEGER,
+    post_id INTEGER,
+    project_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(comment_id) REFERENCES comments(id),
+    FOREIGN KEY(post_id) REFERENCES posts(id),
+    FOREIGN KEY(project_id) REFERENCES projects(id)
+)
+""")
 
-cursor.execute("CREATE TABLE IF NOT EXISTS projects (id INTEGER PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL, user_id INTEGER, comment_id INTEGER, post_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(comment_id) REFERENCES comments(id), FOREIGN KEY(post_id) REFERENCES posts(id))")
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS projects (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    user_id INTEGER,
+    comment_id INTEGER,
+    post_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(comment_id) REFERENCES comments(id),
+    FOREIGN KEY(post_id) REFERENCES posts(id)
+)
+""")
 
-cursor.execute("CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY, text TEXT, user_id INTEGER, project_id INTEGER, post_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(project_id) REFERENCES projects(id), FOREIGN KEY(post_id) REFERENCES posts(id))")
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS comments (
+    id INTEGER PRIMARY KEY,
+    text TEXT,
+    user_id INTEGER,
+    project_id INTEGER,
+    post_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(project_id) REFERENCES projects(id),
+    FOREIGN KEY(post_id) REFERENCES posts(id)
+)
+""")
 
-cursor.execute("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, body TEXT, user_id INTEGER, project_id INTEGER, comment_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id), FOREIGN KEY(project_id) REFERENCES projects(id), FOREIGN KEY(comment_id) REFERENCES comments(id))")
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS posts (
+    id INTEGER PRIMARY KEY,
+    body TEXT,
+    user_id INTEGER,
+    project_id INTEGER,
+    comment_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(project_id) REFERENCES projects(id),
+    FOREIGN KEY(comment_id) REFERENCES comments(id)
+)
+""")
 
 
 # Context processors
@@ -177,14 +230,10 @@ def delete_project(project_id):
 
 @app.route('/project/<int:project_id>', methods=['GET', 'POST'])
 @login_required
-def project(project_id):
+def project_page(project_id):
     if request.method == 'POST':
         post = request.form.get('post')
         user_id = session['user_id']
-
-        cursor.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
-        project = cursor.fetchone()
-        print(project)
 
         cursor.execute("INSERT INTO posts (body, user_id, project_id) VALUES (?, ?, ?)",
                        (post, user_id, project_id))

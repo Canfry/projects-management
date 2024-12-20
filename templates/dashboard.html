@@ -6,7 +6,7 @@
 <div class="w-full h-full flex items-center">
 	<div class="w-1/5 h-full rounded-lg py-4 text-cyan-100 border-r border-cyan-100">
 		<a href="{{ url_for('create_project' )}}"><button
-				class="py-1 px-2 rounded-lg bg-cyan-100 text-gray-950 hover:bg-cyan-200">Create Project</buton></a>
+				class="py-1 px-2 rounded-lg bg-cyan-100 text-gray-950 hover:bg-cyan-200">Create Project</button></a>
 	</div>
 	<div class="w-4/5 h-full">
 		{% if admin_projects == [] %}
@@ -14,7 +14,7 @@
 		{% else %}{% for admin_project in admin_projects %}
 		<div class="w-full flex items-center justify-between pl-8 my-4">
 			<div class="flex-1">
-				<a href="{{url_for('project', project_id=admin_project[3])}}">
+				<a href="{{url_for('project_page', project_id=admin_project[3])}}">
 					<h1 class="text-cyan-100 text-lg flex-1">{{ admin_project[2] }}</h1>
 				</a>
 			</div>
@@ -36,7 +36,7 @@
 	<h1 class="text-cyan-100 text-lg">No projects created yet</h1>
 	{% else %}{% for user_project in user_projects %}
 	<div class="w-full flex items-center justify-between pl-8 my-4">
-		<a href="{{url_for('project', project_id=user_project[3])}}">
+		<a href="{{url_for('project_page', project_id=user_project[3])}}">
 			<h1 class="text-cyan-100 text-lg flex-1">{{ user_project[2] }}</h1>
 		</a>
 		<p class="text-cyan-100 text-sm">{{ user_project[0] }}</p>
