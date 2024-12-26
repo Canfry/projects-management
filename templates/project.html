@@ -10,7 +10,7 @@
 	{% if admin == 'yes' %}
 	<div></div>
 	{% else %}
-	<form action="{{ url_for('project', project_id=project[0]) }}" method="post">
+	<form action="{{ url_for('project_page', project_id=project[0]) }}" method="post">
 		<textarea name="post" class="w-full h-32 bg-gray-800 text-gray-200 font-light p-2 mb-4"
 			placeholder="Post something..."></textarea>
 		<button class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded">Submit</button>

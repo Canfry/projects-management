@@ -41,9 +41,9 @@ CREATE TABLE IF NOT EXISTS users (
     post_id INTEGER,
     project_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(comment_id) REFERENCES comments(id),
-    FOREIGN KEY(post_id) REFERENCES posts(id),
-    FOREIGN KEY(project_id) REFERENCES projects(id)
+    FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
 )
 """)
 
@@ -57,8 +57,8 @@ CREATE TABLE IF NOT EXISTS projects (
     post_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(comment_id) REFERENCES comments(id),
-    FOREIGN KEY(post_id) REFERENCES posts(id)
+    FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+    FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE
 )
 """)
 
@@ -84,9 +84,9 @@ CREATE TABLE IF NOT EXISTS posts (
     project_id INTEGER,
     comment_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(project_id) REFERENCES projects(id),
-    FOREIGN KEY(comment_id) REFERENCES comments(id)
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE
 )
 """)
 

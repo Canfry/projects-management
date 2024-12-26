@@ -33,7 +33,7 @@
 {% else %}
 <div class="w-full h-full">
 	{% if user_projects == [] %}
-	<h1 class="text-cyan-100 text-lg">No projects created yet</h1>
+	<h1 class="text-cyan-100 text-lg">No projects created yet.</h1>
 	{% else %}{% for user_project in user_projects %}
 	<div class="w-full flex items-center justify-between pl-8 my-4">
 		<a href="{{url_for('project_page', project_id=user_project[3])}}">
