@@ -1,5 +1,7 @@
 .DS_Store
 
+submit.txt
+
 node_modules/
 flask_session/
 
