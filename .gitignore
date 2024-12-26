@@ -1,6 +1,7 @@
 .DS_Store
 
 node_modules/
+flask_session/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
