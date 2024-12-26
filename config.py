@@ -1,6 +1,7 @@
 import os
 from datetime import timedelta
 
+
 def config(app):
     # Configure the session
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
