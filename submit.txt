@@ -1,11 +1,7 @@
-- project Title
-- your name
-- your Github and edX username
-- your city and country
+- project Title: MyTeams
+- your name: Christophe Anfry
+- your Github and edX username: Github: Canfry, edX: c-anfry
+- your city and country: Barcelona, Spain
 - Date the video is recorded
 
 
-README.md file should include the following information:
-# YOUR PROJECT TITLE
-#### Video Demo:  <URL HERE>
-#### Description:
