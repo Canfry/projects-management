@@ -178,17 +178,14 @@ def dashboard():
     cursor.execute(
         "SELECT users.name, users.is_admin, projects.name, projects.id FROM users JOIN projects ON users.id = projects.user_id")
     admin_projects = cursor.fetchall()
-    print(admin_projects)
 
     cursor.execute(
         "SELECT users.name, users.is_admin, projects.name, projects.id FROM users JOIN projects ON users.id = projects.user_id WHERE users.id = ?", (session['user_id'],))
     user_projects = cursor.fetchall()
-    print(user_projects)
 
     cursor.execute("SELECT is_admin FROM users WHERE id = ?",
                    (session['user_id'],))
     admin = cursor.fetchone()
-    print(admin)
 
     return render_template('dashboard.html', admin_projects=admin_projects, user_projects=user_projects, admin=admin)
 
@@ -201,9 +198,6 @@ def create_project():
         description = request.form.get('description')
 
         user_id = request.form.get('user_id')
-        # cursor.execute("SELECT id FROM users WHERE name = ?", (user,))
-        # user_id = cursor.fetchone()
-        # print(user_id)
 
         cursor.execute("INSERT INTO projects (name, description, user_id) VALUES (?, ?, ?)",
                        (name, description, user_id))
@@ -214,7 +208,6 @@ def create_project():
 
     cursor.execute("SELECT name, id, is_admin FROM users")
     users = cursor.fetchall()
-    print(users)
     return render_template('create_project.html', users=users)
 
 
@@ -241,20 +234,16 @@ def project_page(project_id):
         return redirect(f'/project/{project_id}')
 
     admin = session['admin']
-    print(admin)
 
     cursor.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
     project = cursor.fetchone()
-    print(project)
 
     cursor.execute(
         "SELECT * FROM comments WHERE project_id = ?", (project_id,))
     comments = cursor.fetchall()
-    print(comments)
 
     cursor.execute("SELECT * FROM posts WHERE project_id = ?", (project_id,))
     posts = cursor.fetchall()
-    print(posts)
 
     return render_template('project.html', project=project, posts=posts, admin=admin, comments=comments)
 
@@ -265,7 +254,6 @@ def comment():
     text = request.form.get('comment')
     user_id = session['user_id']
     project_id = request.form.get('project_id')
-    print(project_id)
 
     cursor.execute("INSERT INTO comments (text, user_id, project_id) VALUES (?, ?, ?)",
                    (text, user_id, project_id))
